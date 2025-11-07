@@ -20,7 +20,7 @@ export default async function Dashboard() {
     redirect('/');
   }
 
-  let user: DiscordUser | null = null;
+  let user: DiscordUser;
   try {
     user = JSON.parse(userCookie.value);
   } catch {

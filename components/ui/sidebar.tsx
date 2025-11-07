@@ -286,14 +286,7 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
       </motion.div>
 
       {/* Main Content Area */}
-      <motion.div
-        className="flex-1 transition-all duration-300"
-        animate={{
-          marginLeft: isDesktopExpanded ? "256px" : "60px",
-        }}
-        style={{ marginLeft: 0 }}
-        className="ml-0 md:ml-[60px]"
-      >
+      <div className="flex-1 ml-0 md:ml-[60px]">
         {/* Top bar for mobile toggle */}
         <div className="p-4 bg-black border-b border-white/5 md:hidden flex justify-between items-center">
           <h1 className="text-xl font-bold text-white/90">R.O.T.I Staff</h1>
@@ -302,7 +295,7 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
         <div className="h-full overflow-auto">
           {children}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

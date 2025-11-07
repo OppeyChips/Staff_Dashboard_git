@@ -78,16 +78,15 @@ export const SidebarBody = ({
 }: {
   className?: string;
   children: React.ReactNode;
-  [key: string]: any;
 }) => {
   const { open, setOpen, animate } = useSidebar();
 
   return (
     <>
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar - Hidden on mobile */}
       <motion.div
         className={cn(
-          "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
+          "h-full px-4 py-4 hidden md:flex md:flex-col flex-shrink-0",
           className
         )}
         animate={{
@@ -100,114 +99,59 @@ export const SidebarBody = ({
         {children}
       </motion.div>
 
-      {/* Mobile Sidebar */}
-      <div className="md:hidden w-full">
-        <div className="h-10 px-4 py-4 flex flex-row items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full">
-          <div className="flex justify-end z-20 w-full">
+      {/* Mobile Sidebar - Hidden on desktop */}
+      <div className="md:hidden">
+        {/* Mobile Header with Menu Button */}
+        <div className="h-16 px-4 flex items-center justify-between bg-black border-b border-white/5">
+          <div className="flex justify-end w-full">
             <Menu
-              className="text-neutral-800 dark:text-neutral-200 cursor-pointer"
+              className="text-white/90 cursor-pointer h-6 w-6"
               onClick={() => setOpen(!open)}
             />
           </div>
         </div>
+
+        {/* Mobile Sidebar Overlay */}
         <AnimatePresence>
           {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className="fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between"
-            >
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
-                onClick={() => setOpen(!open)}
+            <>
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="fixed inset-0 bg-black/50 z-40"
+                onClick={() => setOpen(false)}
+              />
+
+              {/* Sidebar Panel */}
+              <motion.div
+                initial={{ x: "-100%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: "-100%", opacity: 0 }}
+                transition={{
+                  duration: 0.3,
+                  ease: "easeInOut",
+                }}
+                className={cn(
+                  "fixed top-0 left-0 h-full w-[280px] z-50 p-4 flex flex-col justify-between",
+                  className
+                )}
               >
-                <X />
-              </div>
-              {children}
-            </motion.div>
+                <div
+                  className="absolute right-4 top-4 z-50 text-white/90 cursor-pointer"
+                  onClick={() => setOpen(false)}
+                >
+                  <X className="h-6 w-6" />
+                </div>
+                {children}
+              </motion.div>
+            </>
           )}
         </AnimatePresence>
       </div>
     </>
-  );
-};
-
-export const DesktopSidebar = ({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof motion.div>) => {
-  const { open, setOpen, animate } = useSidebar();
-  return (
-    <motion.div
-      className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-neutral-100 dark:bg-neutral-800 w-[300px] flex-shrink-0",
-        className
-      )}
-      animate={{
-        width: animate ? (open ? "300px" : "60px") : "300px",
-      }}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      {...props}
-    >
-      {children}
-    </motion.div>
-  );
-};
-
-export const MobileSidebar = ({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<"div">) => {
-  const { open, setOpen } = useSidebar();
-  return (
-    <div className="md:hidden">
-      <div
-        className={cn(
-          "h-10 px-4 py-4 flex flex-row items-center justify-between bg-neutral-100 dark:bg-neutral-800 w-full"
-        )}
-        {...props}
-      >
-        <div className="flex justify-end z-20 w-full">
-          <Menu
-            className="text-neutral-800 dark:text-neutral-200 cursor-pointer"
-            onClick={() => setOpen(!open)}
-          />
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
-                className
-              )}
-            >
-              <div
-                className="absolute right-10 top-10 z-50 text-neutral-800 dark:text-neutral-200 cursor-pointer"
-                onClick={() => setOpen(!open)}
-              >
-                <X />
-              </div>
-              {children}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </div>
   );
 };
 
@@ -225,7 +169,7 @@ export const SidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-2 group/sidebar py-2",
+        "flex items-center justify-start gap-2 group/sidebar py-2 px-2 rounded-md hover:bg-white/5 transition-colors",
         className
       )}
       {...props}

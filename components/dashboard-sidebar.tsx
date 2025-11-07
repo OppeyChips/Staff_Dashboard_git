@@ -54,12 +54,7 @@ export function DashboardSidebar({ username, userId, avatar, children }: Dashboa
     : "https://cdn.discordapp.com/embed/avatars/0.png";
 
   return (
-    <div
-      className={cn(
-        "flex flex-col md:flex-row bg-black w-full flex-1 overflow-hidden",
-        "h-screen"
-      )}
-    >
+    <div className="flex flex-col md:flex-row bg-black w-full min-h-screen">
       <Sidebar open={open} setOpen={setOpen} animate={true}>
         <SidebarBody className="justify-between gap-10 bg-black border-r border-white/5">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
@@ -89,10 +84,8 @@ export function DashboardSidebar({ username, userId, avatar, children }: Dashboa
           </div>
         </SidebarBody>
       </Sidebar>
-      <div className="flex flex-1">
-        <div className="flex flex-col flex-1 w-full h-full overflow-auto bg-black">
-          {children}
-        </div>
+      <div className="flex-1 w-full overflow-auto bg-black">
+        {children}
       </div>
     </div>
   );

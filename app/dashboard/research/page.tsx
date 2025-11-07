@@ -12,6 +12,19 @@ export default function ResearchPage() {
     ideas: "",
     channelId: "",
   });
+  const [images, setImages] = useState<{
+    commands: File | null;
+    module: File | null;
+    suggestions: File | null;
+    workflow: File | null;
+    ideas: File | null;
+  }>({
+    commands: null,
+    module: null,
+    suggestions: null,
+    workflow: null,
+    ideas: null,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -21,12 +34,24 @@ export default function ResearchPage() {
     setMessage("");
 
     try {
+      // Create FormData to handle file uploads
+      const formDataToSend = new FormData();
+
+      // Add text fields
+      Object.entries(formData).forEach(([key, value]) => {
+        formDataToSend.append(key, value);
+      });
+
+      // Add image files
+      Object.entries(images).forEach(([key, file]) => {
+        if (file) {
+          formDataToSend.append(`${key}_image`, file);
+        }
+      });
+
       const response = await fetch("/api/discord/send-research", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        body: formDataToSend,
       });
 
       const data = await response.json();
@@ -41,6 +66,13 @@ export default function ResearchPage() {
           workflow: "",
           ideas: "",
           channelId: "",
+        });
+        setImages({
+          commands: null,
+          module: null,
+          suggestions: null,
+          workflow: null,
+          ideas: null,
         });
       } else {
         setMessage(`✗ Error: ${data.error || "Failed to send data"}`);
@@ -58,6 +90,17 @@ export default function ResearchPage() {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleImageChange = (
+    field: keyof typeof images,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0] || null;
+    setImages({
+      ...images,
+      [field]: file,
     });
   };
 
@@ -87,6 +130,18 @@ export default function ResearchPage() {
               placeholder="Enter command details..."
               className="w-full h-32 bg-white/[0.02] border border-white/10 rounded-md px-4 py-3 text-white/90 placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.03] transition-all resize-none"
             />
+            <div className="mt-2">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-white/[0.02] border border-white/10 rounded-md text-white/60 text-sm cursor-pointer hover:bg-white/[0.05] transition-all">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange("commands", e)}
+                  className="hidden"
+                />
+                <span>📎 Attach Image</span>
+                {images.commands && <span className="text-purple-400">({images.commands.name})</span>}
+              </label>
+            </div>
           </div>
 
           {/* Module Section */}
@@ -101,6 +156,18 @@ export default function ResearchPage() {
               placeholder="Enter module information..."
               className="w-full h-32 bg-white/[0.02] border border-white/10 rounded-md px-4 py-3 text-white/90 placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.03] transition-all resize-none"
             />
+            <div className="mt-2">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-white/[0.02] border border-white/10 rounded-md text-white/60 text-sm cursor-pointer hover:bg-white/[0.05] transition-all">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange("module", e)}
+                  className="hidden"
+                />
+                <span>📎 Attach Image</span>
+                {images.module && <span className="text-purple-400">({images.module.name})</span>}
+              </label>
+            </div>
           </div>
 
           {/* Suggestions Section */}
@@ -115,6 +182,18 @@ export default function ResearchPage() {
               placeholder="Enter your suggestions..."
               className="w-full h-32 bg-white/[0.02] border border-white/10 rounded-md px-4 py-3 text-white/90 placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.03] transition-all resize-none"
             />
+            <div className="mt-2">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-white/[0.02] border border-white/10 rounded-md text-white/60 text-sm cursor-pointer hover:bg-white/[0.05] transition-all">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange("suggestions", e)}
+                  className="hidden"
+                />
+                <span>📎 Attach Image</span>
+                {images.suggestions && <span className="text-purple-400">({images.suggestions.name})</span>}
+              </label>
+            </div>
           </div>
 
           {/* Workflow Section */}
@@ -129,6 +208,18 @@ export default function ResearchPage() {
               placeholder="Enter workflow details..."
               className="w-full h-32 bg-white/[0.02] border border-white/10 rounded-md px-4 py-3 text-white/90 placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.03] transition-all resize-none"
             />
+            <div className="mt-2">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-white/[0.02] border border-white/10 rounded-md text-white/60 text-sm cursor-pointer hover:bg-white/[0.05] transition-all">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange("workflow", e)}
+                  className="hidden"
+                />
+                <span>📎 Attach Image</span>
+                {images.workflow && <span className="text-purple-400">({images.workflow.name})</span>}
+              </label>
+            </div>
           </div>
 
           {/* Ideas Section */}
@@ -143,6 +234,18 @@ export default function ResearchPage() {
               placeholder="Enter your ideas..."
               className="w-full h-32 bg-white/[0.02] border border-white/10 rounded-md px-4 py-3 text-white/90 placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:bg-white/[0.03] transition-all resize-none"
             />
+            <div className="mt-2">
+              <label className="inline-flex items-center gap-2 px-4 py-2 bg-white/[0.02] border border-white/10 rounded-md text-white/60 text-sm cursor-pointer hover:bg-white/[0.05] transition-all">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageChange("ideas", e)}
+                  className="hidden"
+                />
+                <span>📎 Attach Image</span>
+                {images.ideas && <span className="text-purple-400">({images.ideas.name})</span>}
+              </label>
+            </div>
           </div>
 
           {/* Channel ID and Send Button */}

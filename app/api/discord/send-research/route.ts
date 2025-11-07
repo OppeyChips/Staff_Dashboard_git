@@ -25,9 +25,22 @@ export async function POST(request: NextRequest) {
 
     const user = JSON.parse(userCookie.value);
 
-    // Parse request body
-    const data: ResearchData = await request.json();
-    const { commands, module, suggestions, workflow, ideas, channelId } = data;
+    // Parse request body (FormData for file uploads)
+    const formData = await request.formData();
+
+    const commands = formData.get('commands') as string || '';
+    const module = formData.get('module') as string || '';
+    const suggestions = formData.get('suggestions') as string || '';
+    const workflow = formData.get('workflow') as string || '';
+    const ideas = formData.get('ideas') as string || '';
+    const channelId = formData.get('channelId') as string;
+
+    // Get image files
+    const commandsImage = formData.get('commands_image') as File | null;
+    const moduleImage = formData.get('module_image') as File | null;
+    const suggestionsImage = formData.get('suggestions_image') as File | null;
+    const workflowImage = formData.get('workflow_image') as File | null;
+    const ideasImage = formData.get('ideas_image') as File | null;
 
     if (!channelId) {
       return NextResponse.json(
@@ -85,6 +98,34 @@ export async function POST(request: NextRequest) {
       },
     };
 
+    // Prepare FormData for Discord API (to support file uploads)
+    const discordFormData = new FormData();
+
+    // Add payload_json with message content and embeds
+    discordFormData.append('payload_json', JSON.stringify({
+      content: messageContent || 'No content provided',
+      embeds: [mainEmbed],
+    }));
+
+    // Add image files if they exist
+    const imageFiles = [
+      { file: commandsImage, name: 'commands' },
+      { file: moduleImage, name: 'module' },
+      { file: suggestionsImage, name: 'suggestions' },
+      { file: workflowImage, name: 'workflow' },
+      { file: ideasImage, name: 'ideas' },
+    ];
+
+    let fileIndex = 0;
+    for (const { file, name } of imageFiles) {
+      if (file) {
+        const buffer = await file.arrayBuffer();
+        const blob = new Blob([buffer], { type: file.type });
+        discordFormData.append(`files[${fileIndex}]`, blob, `${name}_${file.name}`);
+        fileIndex++;
+      }
+    }
+
     // Send message to Discord
     const discordResponse = await fetch(
       `https://discord.com/api/v10/channels/${channelId}/messages`,
@@ -92,12 +133,8 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: {
           'Authorization': `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          content: messageContent || 'No content provided',
-          embeds: [mainEmbed],
-        }),
+        body: discordFormData,
       }
     );
 

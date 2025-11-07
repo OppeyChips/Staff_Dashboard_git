@@ -46,7 +46,7 @@ export function DashboardSidebar({ username, userId, avatar, children }: Dashboa
     },
   ];
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
 
   // Discord avatar URL
   const avatarUrl = avatar
@@ -60,7 +60,7 @@ export function DashboardSidebar({ username, userId, avatar, children }: Dashboa
         "h-screen"
       )}
     >
-      <Sidebar open={open} setOpen={setOpen}>
+      <Sidebar open={open} setOpen={setOpen} animate={true}>
         <SidebarBody className="justify-between gap-10 bg-black border-r border-white/5">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}

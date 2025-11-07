@@ -75,6 +75,9 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
   const { open, setOpen, animate } = useSidebar();
   const { className, children, ...restProps } = props;
   
+  // Extract children as React.ReactNode to avoid type issues
+  const childrenContent = children as React.ReactNode;
+  
   return (
     <>
       {/* Desktop Sidebar - Hidden on mobile */}
@@ -90,7 +93,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
         onMouseLeave={() => setOpen(false)}
         {...restProps}
       >
-        {children}
+        {childrenContent}
       </motion.div>
 
       {/* Mobile Sidebar - Hidden on desktop */}
@@ -122,7 +125,7 @@ export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
                 <X />
               </div>
               <div className="flex flex-col flex-1">
-                {children}
+                {childrenContent}
               </div>
             </motion.div>
           )}

@@ -81,11 +81,13 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(new URL('/dashboard', request.url));
 
     // Set session cookie with user data (you may want to use a more secure session management solution)
+    const isProduction = process.env.NODE_ENV === 'production';
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       sameSite: 'lax' as const,
       path: '/',
+      ...(isProduction && { domain: '.profchips.beer' }), // Set domain for production
     };
 
     response.cookies.set('discord_user', JSON.stringify({

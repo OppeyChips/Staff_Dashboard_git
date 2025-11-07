@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Home, User, Settings, Bell, Grid, ChevronDown, ChevronRight } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const AnimatedMenuToggle = ({
@@ -111,14 +111,15 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktopExpanded, setIsDesktopExpanded] = useState(false);
 
   const mobileSidebarVariants = {
     hidden: { x: "-100%" },
     visible: { x: 0 },
   };
 
-  const toggleSidebar = () => setIsOpen(!isOpen);
+  const toggleMobileSidebar = () => setIsMobileOpen(!isMobileOpen);
 
   // Discord avatar URL
   const avatarUrl = avatar
@@ -129,7 +130,7 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
     <div className="flex h-screen bg-black">
       {/* Mobile Sidebar */}
       <AnimatePresence>
-        {isOpen && (
+        {isMobileOpen && (
           <>
             {/* Backdrop */}
             <motion.div
@@ -138,7 +139,7 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
               className="md:hidden fixed inset-0 z-40 bg-black/50"
-              onClick={toggleSidebar}
+              onClick={toggleMobileSidebar}
             />
 
             {/* Sidebar Panel */}
@@ -198,34 +199,60 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
         )}
       </AnimatePresence>
 
-      {/* Desktop Sidebar */}
-      <div className="hidden md:flex flex-col fixed top-0 left-0 h-full w-64 bg-black border-r border-white/5">
+      {/* Desktop Sidebar - Hover to expand */}
+      <motion.div
+        className="hidden md:flex flex-col fixed top-0 left-0 h-full bg-black border-r border-white/5"
+        animate={{
+          width: isDesktopExpanded ? "256px" : "60px",
+        }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        onMouseEnter={() => setIsDesktopExpanded(true)}
+        onMouseLeave={() => setIsDesktopExpanded(false)}
+      >
         {/* Profile Section */}
-        <div className="p-4 border-b border-white/5">
-          <div className="flex items-center space-x-3">
+        <div className="p-4 border-b border-white/5 min-h-[80px] flex items-center overflow-hidden">
+          <div className="flex items-center space-x-3 w-full">
             <img
               src={avatarUrl}
               alt="Avatar"
-              className="w-12 h-12 rounded-full"
+              className="w-10 h-10 rounded-full flex-shrink-0"
             />
-            <div>
-              <p className="font-semibold text-white/90">{username}</p>
-              <p className="text-sm text-white/40">R.O.T.I Staff</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, width: 0 }}
+              animate={{
+                opacity: isDesktopExpanded ? 1 : 0,
+                width: isDesktopExpanded ? "auto" : 0,
+              }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden whitespace-nowrap"
+            >
+              <p className="font-semibold text-white/90 text-sm">{username}</p>
+              <p className="text-xs text-white/40">R.O.T.I Staff</p>
+            </motion.div>
           </div>
         </div>
 
         {/* Navigation Section */}
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex-1 p-4 overflow-y-auto overflow-x-hidden">
           <ul>
             {links.map((link, idx) => (
               <li key={idx} className="mb-2">
                 <a
                   href={link.href}
-                  className="flex gap-2 font-medium text-sm items-center w-full py-2 px-4 rounded-xl hover:bg-white/5 transition-colors text-white/90"
+                  className="flex gap-3 font-medium text-sm items-center w-full py-2 px-3 rounded-xl hover:bg-white/5 transition-colors text-white/90"
                 >
-                  {link.icon}
-                  {link.label}
+                  <span className="flex-shrink-0">{link.icon}</span>
+                  <motion.span
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{
+                      opacity: isDesktopExpanded ? 1 : 0,
+                      width: isDesktopExpanded ? "auto" : 0,
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden whitespace-nowrap"
+                  >
+                    {link.label}
+                  </motion.span>
                 </a>
               </li>
             ))}
@@ -236,24 +263,46 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
         <div className="p-4 border-t border-white/5">
           <a
             href="/dashboard/profile"
-            className="block w-full font-medium text-sm p-2 text-center bg-purple-500/90 rounded-xl hover:bg-purple-500 transition-colors text-white"
+            className={cn(
+              "flex items-center justify-center font-medium text-sm p-2 bg-purple-500/90 rounded-xl hover:bg-purple-500 transition-colors text-white overflow-hidden",
+              isDesktopExpanded ? "px-4" : "px-2"
+            )}
           >
-            View profile
+            <motion.span
+              animate={{
+                opacity: isDesktopExpanded ? 1 : 0,
+                width: isDesktopExpanded ? "auto" : 0,
+              }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden whitespace-nowrap"
+            >
+              View profile
+            </motion.span>
+            {!isDesktopExpanded && (
+              <span className="text-lg">👤</span>
+            )}
           </a>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-0 md:ml-64 transition-all duration-300">
+      <motion.div
+        className="flex-1 transition-all duration-300"
+        animate={{
+          marginLeft: isDesktopExpanded ? "256px" : "60px",
+        }}
+        style={{ marginLeft: 0 }}
+        className="ml-0 md:ml-[60px]"
+      >
         {/* Top bar for mobile toggle */}
         <div className="p-4 bg-black border-b border-white/5 md:hidden flex justify-between items-center">
           <h1 className="text-xl font-bold text-white/90">R.O.T.I Staff</h1>
-          <AnimatedMenuToggle toggle={toggleSidebar} isOpen={isOpen} />
+          <AnimatedMenuToggle toggle={toggleMobileSidebar} isOpen={isMobileOpen} />
         </div>
         <div className="h-full overflow-auto">
           {children}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

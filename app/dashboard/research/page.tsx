@@ -10,6 +10,7 @@ export default function ResearchPage() {
     suggestions: "",
     workflow: "",
     ideas: "",
+    tags: [] as string[],
     channelId: "",
   });
   const [images, setImages] = useState<{
@@ -39,7 +40,11 @@ export default function ResearchPage() {
 
       // Add text fields
       Object.entries(formData).forEach(([key, value]) => {
-        formDataToSend.append(key, value);
+        if (key === 'tags') {
+          formDataToSend.append(key, JSON.stringify(value));
+        } else {
+          formDataToSend.append(key, value as string);
+        }
       });
 
       // Add image files
@@ -65,6 +70,7 @@ export default function ResearchPage() {
           suggestions: "",
           workflow: "",
           ideas: "",
+          tags: [],
           channelId: "",
         });
         setImages({
@@ -248,8 +254,43 @@ export default function ResearchPage() {
             </div>
           </div>
 
+          {/* Tags Section */}
+          <div className="group pt-4 border-t border-white/5">
+            <label className="block text-sm font-light text-white/60 mb-3 uppercase tracking-wider">
+              Tags
+            </label>
+            <div className="flex flex-wrap gap-3">
+              {["idea", "suggestion", "research"].map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      tags: prev.tags.includes(tag)
+                        ? prev.tags.filter((t) => t !== tag)
+                        : [...prev.tags, tag],
+                    }));
+                  }}
+                  className={`px-4 py-2 rounded-md text-sm font-light transition-all capitalize ${
+                    formData.tags.includes(tag)
+                      ? "bg-purple-500/90 text-white border border-purple-500"
+                      : "bg-white/[0.02] text-white/60 border border-white/10 hover:bg-white/[0.05]"
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+            {formData.tags.length > 0 && (
+              <p className="mt-2 text-xs text-white/40">
+                Selected: {formData.tags.join(", ")}
+              </p>
+            )}
+          </div>
+
           {/* Channel ID and Send Button */}
-          <div className="pt-4 border-t border-white/5">
+          <div className="pt-4">
             <label className="block text-sm font-light text-white/60 mb-2 uppercase tracking-wider">
               Channel ID
             </label>

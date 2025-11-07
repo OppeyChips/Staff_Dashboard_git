@@ -7,6 +7,7 @@ interface ResearchData {
   suggestions: string;
   workflow: string;
   ideas: string;
+  tags: string[];
   channelId: string;
 }
 
@@ -33,6 +34,8 @@ export async function POST(request: NextRequest) {
     const suggestions = formData.get('suggestions') as string || '';
     const workflow = formData.get('workflow') as string || '';
     const ideas = formData.get('ideas') as string || '';
+    const tagsString = formData.get('tags') as string || '[]';
+    const tags = JSON.parse(tagsString) as string[];
     const channelId = formData.get('channelId') as string;
 
     // Get image files
@@ -87,8 +90,8 @@ export async function POST(request: NextRequest) {
       messageContent += `## Ideas\n${ideas}\n\n`;
     }
 
-    // Create main embed with author info only
-    const mainEmbed = {
+    // Create main embed with author info and tags
+    const mainEmbed: any = {
       title: '📊 Research & Development Report',
       description: `Submitted by **${user.username}**`,
       color: 0xA855F7, // Purple
@@ -97,6 +100,17 @@ export async function POST(request: NextRequest) {
         text: 'R.O.T.I Staff Dashboard',
       },
     };
+
+    // Add tags field to embed if tags are selected
+    if (tags.length > 0) {
+      mainEmbed.fields = [
+        {
+          name: '🏷️ Tags',
+          value: tags.map(tag => `\`${tag}\``).join(' • '),
+          inline: false,
+        },
+      ];
+    }
 
     // Prepare FormData for Discord API (to support file uploads)
     const discordFormData = new FormData();

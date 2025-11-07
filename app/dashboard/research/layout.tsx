@@ -22,7 +22,7 @@ export default async function ResearchLayout({
     redirect('/');
   }
 
-  let user: DiscordUser | null = null;
+  let user: DiscordUser;
   try {
     user = JSON.parse(userCookie.value);
   } catch {

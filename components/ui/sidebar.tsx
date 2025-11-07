@@ -83,7 +83,7 @@ export const SidebarBody = ({
 
   return (
     <>
-      {/* Desktop Sidebar - Hidden on mobile */}
+      {/* Desktop Sidebar - Only visible on md and up */}
       <motion.div
         className={cn(
           "h-full px-4 py-4 hidden md:flex md:flex-col flex-shrink-0",
@@ -99,8 +99,8 @@ export const SidebarBody = ({
         {children}
       </motion.div>
 
-      {/* Mobile Sidebar - Hidden on desktop */}
-      <div className="md:hidden">
+      {/* Mobile Sidebar - Only visible below md */}
+      <div className="block md:hidden">
         {/* Mobile Header with Menu Button */}
         <div className="h-16 px-4 flex items-center justify-between bg-black border-b border-white/5">
           <div className="flex justify-end w-full">

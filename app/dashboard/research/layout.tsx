@@ -1,0 +1,41 @@
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+
+interface DiscordUser {
+  id: string;
+  username: string;
+  discriminator: string;
+  avatar: string;
+  email?: string;
+}
+
+export default async function ResearchLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const cookieStore = await cookies();
+  const userCookie = cookieStore.get('discord_user');
+
+  if (!userCookie) {
+    redirect('/');
+  }
+
+  let user: DiscordUser | null = null;
+  try {
+    user = JSON.parse(userCookie.value);
+  } catch {
+    redirect('/');
+  }
+
+  return (
+    <DashboardSidebar
+      username={user.username}
+      userId={user.id}
+      avatar={user.avatar}
+    >
+      {children}
+    </DashboardSidebar>
+  );
+}

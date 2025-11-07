@@ -184,15 +184,6 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
                   </ul>
                 </nav>
 
-                {/* Footer / Action Button */}
-                <div className="p-4 border-t border-white/5">
-                  <a
-                    href="/dashboard/profile"
-                    className="block w-full font-medium text-sm p-2 text-center bg-purple-500/90 rounded-xl hover:bg-purple-500 transition-colors text-white"
-                  >
-                    View profile
-                  </a>
-                </div>
               </div>
             </motion.div>
           </>
@@ -210,12 +201,12 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
         onMouseLeave={() => setIsDesktopExpanded(false)}
       >
         {/* Profile Section */}
-        <div className="p-4 border-b border-white/5 min-h-[80px] flex items-center overflow-hidden">
+        <div className="p-3 border-b border-white/5 min-h-[68px] flex items-center overflow-hidden">
           <div className="flex items-center space-x-3 w-full">
             <img
               src={avatarUrl}
               alt="Avatar"
-              className="w-10 h-10 rounded-full flex-shrink-0"
+              className="w-8 h-8 rounded-full flex-shrink-0"
             />
             <motion.div
               initial={{ opacity: 0, width: 0 }}
@@ -259,30 +250,6 @@ const Sidebar = ({ username, userId, avatar, links, children }: SidebarProps) =>
           </ul>
         </nav>
 
-        {/* Footer / Action Button */}
-        <div className="p-4 border-t border-white/5">
-          <a
-            href="/dashboard/profile"
-            className={cn(
-              "flex items-center justify-center font-medium text-sm p-2 bg-purple-500/90 rounded-xl hover:bg-purple-500 transition-colors text-white overflow-hidden",
-              isDesktopExpanded ? "px-4" : "px-2"
-            )}
-          >
-            <motion.span
-              animate={{
-                opacity: isDesktopExpanded ? 1 : 0,
-                width: isDesktopExpanded ? "auto" : 0,
-              }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden whitespace-nowrap"
-            >
-              View profile
-            </motion.span>
-            {!isDesktopExpanded && (
-              <span className="text-lg">👤</span>
-            )}
-          </a>
-        </div>
       </motion.div>
 
       {/* Main Content Area */}

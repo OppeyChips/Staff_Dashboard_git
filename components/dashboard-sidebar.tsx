@@ -46,7 +46,7 @@ export function DashboardSidebar({ username, userId, avatar, children }: Dashboa
     },
   ];
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   // Discord avatar URL
   const avatarUrl = avatar

@@ -32,7 +32,6 @@ export default async function DashboardLayout({
 
   return (
     <DashboardSidebar
-      key={user.id}
       username={user.username}
       userId={user.id}
       avatar={user.avatar}

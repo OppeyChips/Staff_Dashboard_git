@@ -16,7 +16,14 @@ export const metadata: Metadata = {
   title: "R.O.T.I Staff",
   description: "Staff Dashboard for R.O.T.I",
   icons: {
-    icon: "/logo1.png",
+    icon: [
+      {
+        url: "/logo1.png",
+        sizes: "any",
+      },
+    ],
+    apple: "/logo1.png",
+    shortcut: "/logo1.png",
   },
 };
 

@@ -20,13 +20,16 @@ export default async function DashboardLayout({
   const userCookie = cookieStore.get('discord_user');
 
   if (!userCookie) {
+    console.error('No discord_user cookie found');
     redirect('/');
   }
 
   let user: DiscordUser;
   try {
     user = JSON.parse(userCookie.value);
-  } catch {
+    console.log('User authenticated:', user.username);
+  } catch (error) {
+    console.error('Failed to parse user cookie:', error);
     redirect('/');
   }
 

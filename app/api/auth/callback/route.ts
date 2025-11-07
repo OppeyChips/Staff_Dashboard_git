@@ -81,6 +81,13 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(new URL('/dashboard', request.url));
 
     // Set session cookie with user data (you may want to use a more secure session management solution)
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      path: '/',
+    };
+
     response.cookies.set('discord_user', JSON.stringify({
       id: userData.id,
       username: userData.username,
@@ -89,20 +96,14 @@ export async function GET(request: NextRequest) {
       avatar: userData.avatar,
       email: userData.email,
     }), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      ...cookieOptions,
       maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
     });
 
     // Optionally store the access token (consider encryption in production)
     response.cookies.set('discord_token', tokenData.access_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      ...cookieOptions,
       maxAge: tokenData.expires_in,
-      path: '/',
     });
 
     return response;

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import connectDB from '@/lib/mongoose';
+import Activity from '@/lib/models/Activity';
+import UserStats from '@/lib/models/UserStats';
 
 interface ResearchData {
   commands: string;
@@ -9,6 +12,7 @@ interface ResearchData {
   ideas: string;
   tags: string[];
   channelId: string;
+  selectedCommand?: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -37,6 +41,7 @@ export async function POST(request: NextRequest) {
     const tagsString = formData.get('tags') as string || '[]';
     const tags = JSON.parse(tagsString) as string[];
     const channelId = formData.get('channelId') as string;
+    const selectedCommand = formData.get('selectedCommand') as string || '';
 
     // Get image files
     const commandsImage = formData.get('commands_image') as File | null;
@@ -90,11 +95,40 @@ export async function POST(request: NextRequest) {
       messageContent += `## Ideas\n${ideas}\n\n`;
     }
 
+    // Define embed customization based on selected command
+    let embedConfig = {
+      title: '📊 Research & Development Report',
+      color: 0xA855F7, // Purple (default)
+      icon: '📊',
+    };
+
+    if (selectedCommand === 'AFK') {
+      embedConfig = {
+        title: '🎙️ AFK Command Research',
+        color: 0x3B82F6, // Blue
+        icon: '🎙️',
+      };
+    } else if (selectedCommand === 'Tempvoice') {
+      embedConfig = {
+        title: '🔊 Tempvoice Command Research',
+        color: 0x22C55E, // Green
+        icon: '🔊',
+      };
+    } else if (selectedCommand === 'Highlight') {
+      embedConfig = {
+        title: '✨ Highlight Command Research',
+        color: 0xEAB308, // Yellow
+        icon: '✨',
+      };
+    }
+
     // Create main embed with author info and tags
     const mainEmbed: any = {
-      title: '📊 Research & Development Report',
-      description: `Submitted by **${user.username}**`,
-      color: 0xA855F7, // Purple
+      title: embedConfig.title,
+      description: selectedCommand
+        ? `**Command:** ${selectedCommand}\n**Submitted by:** ${user.username}`
+        : `Submitted by **${user.username}**`,
+      color: embedConfig.color,
       timestamp: new Date().toISOString(),
       footer: {
         text: 'R.O.T.I Staff Dashboard',
@@ -173,6 +207,50 @@ export async function POST(request: NextRequest) {
         { error: errorMessage, details: errorData },
         { status: discordResponse.status }
       );
+    }
+
+    // Log activity and update stats in MongoDB
+    try {
+      await connectDB();
+
+      // Log activity
+      await Activity.create({
+        userId: user.id,
+        action: 'Submitted research report',
+        command: selectedCommand,
+        metadata: {
+          channelId,
+          tags,
+          hasAttachments: fileIndex > 0,
+        },
+      });
+
+      // Update user stats
+      const stats = await UserStats.findOne({ userId: user.id });
+      if (stats) {
+        stats.researchSubmissions += 1;
+        if (selectedCommand && selectedCommand in stats.commandStats) {
+          stats.commandStats[selectedCommand] += 1;
+        }
+        stats.lastActive = new Date();
+        stats.updatedAt = new Date();
+        await stats.save();
+      } else {
+        // Create new stats if not exists
+        await UserStats.create({
+          userId: user.id,
+          researchSubmissions: 1,
+          commandStats: {
+            AFK: selectedCommand === 'AFK' ? 1 : 0,
+            Tempvoice: selectedCommand === 'Tempvoice' ? 1 : 0,
+            Highlight: selectedCommand === 'Highlight' ? 1 : 0,
+          },
+          lastActive: new Date(),
+        });
+      }
+    } catch (dbError) {
+      console.error('Error logging activity to database:', dbError);
+      // Don't fail the request if DB logging fails
     }
 
     return NextResponse.json(

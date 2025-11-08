@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Send } from "lucide-react";
+import { Send, Mic, Volume2, Highlighter } from "lucide-react";
+import { ActionSearchBar } from "@/components/ui/action-search-bar";
 
 export default function ResearchPage() {
+  const [selectedCommand, setSelectedCommand] = useState<string>("");
   const [formData, setFormData] = useState({
     commands: "",
     module: "",
@@ -29,6 +31,34 @@ export default function ResearchPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
+  // Define command actions for ActionSearchBar
+  const commandActions = [
+    {
+      id: "1",
+      label: "AFK",
+      icon: <Mic className="h-4 w-4 text-blue-500" />,
+      description: "Away From Keyboard Command",
+      short: "",
+      end: "Command",
+    },
+    {
+      id: "2",
+      label: "Tempvoice",
+      icon: <Volume2 className="h-4 w-4 text-green-500" />,
+      description: "Temporary Voice Channel",
+      short: "",
+      end: "Command",
+    },
+    {
+      id: "3",
+      label: "Highlight",
+      icon: <Highlighter className="h-4 w-4 text-yellow-500" />,
+      description: "Message Highlighting System",
+      short: "",
+      end: "Command",
+    },
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -46,6 +76,9 @@ export default function ResearchPage() {
           formDataToSend.append(key, value as string);
         }
       });
+
+      // Add selected command
+      formDataToSend.append('selectedCommand', selectedCommand);
 
       // Add image files
       Object.entries(images).forEach(([key, file]) => {
@@ -119,11 +152,27 @@ export default function ResearchPage() {
         <h1 className="text-3xl font-light text-white/90 mb-2 tracking-tight">
           Research & Development
         </h1>
-        <p className="text-white/40 mb-12 text-sm">
+        <p className="text-white/40 mb-8 text-sm">
           Document your research findings and send them to Discord
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Command Selection */}
+          <div className="group">
+            <label className="block text-sm font-light text-white/60 mb-2 uppercase tracking-wider">
+              Select Command
+            </label>
+            <ActionSearchBar
+              actions={commandActions}
+              onSelect={(action) => setSelectedCommand(action.label)}
+              placeholder="Choose a command (AFK, Tempvoice, Highlight)..."
+            />
+            {selectedCommand && (
+              <p className="mt-2 text-xs text-purple-400">
+                Selected: {selectedCommand}
+              </p>
+            )}
+          </div>
           {/* Commands Section */}
           <div className="group">
             <label className="block text-sm font-light text-white/60 mb-2 uppercase tracking-wider">

@@ -59,7 +59,9 @@ export async function GET(request: NextRequest) {
     });
 
     if (!tokenResponse.ok) {
-      throw new Error('Failed to exchange code for token');
+      const errorData = await tokenResponse.json();
+      console.error('Discord token exchange failed:', errorData);
+      throw new Error(`Failed to exchange code for token: ${JSON.stringify(errorData)}`);
     }
 
     const tokenData: DiscordTokenResponse = await tokenResponse.json();

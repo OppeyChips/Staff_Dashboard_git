@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { DashboardContent } from '@/components/dashboard-content';
 
 interface DiscordUser {
   id: string;
@@ -26,22 +27,5 @@ export default async function Dashboard() {
     redirect('/');
   }
 
-  // Use global_name (display name) if available, otherwise username
-  const displayName = user.global_name || user.username;
-
-  return (
-    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-      {/* Purple glow from top right */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-[120px] pointer-events-none" />
-
-      <div className="relative z-10 text-center">
-        <h1 className="text-5xl font-light text-white/90 tracking-tight">
-          Hello, {displayName}
-        </h1>
-        <p className="mt-4 text-white/40 text-sm">
-          Welcome to the Staff Dashboard
-        </p>
-      </div>
-    </div>
-  );
+  return <DashboardContent user={user} />;
 }

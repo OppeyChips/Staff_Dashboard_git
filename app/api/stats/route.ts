@@ -53,12 +53,12 @@ export async function GET(request: NextRequest) {
       const dayStart = new Date(date.setHours(0, 0, 0, 0));
       const dayEnd = new Date(date.setHours(23, 59, 59, 999));
 
-      const daySessions = stats.sessions.filter(session => {
+      const daySessions = stats.sessions.filter((session: { date: Date; duration: number }) => {
         const sessionDate = new Date(session.date);
         return sessionDate >= dayStart && sessionDate <= dayEnd;
       });
 
-      const totalHours = daySessions.reduce((sum, session) => sum + session.duration, 0) / 60;
+      const totalHours = daySessions.reduce((sum: number, session: { date: Date; duration: number }) => sum + session.duration, 0) / 60;
 
       weeklyActivity.push({
         day: days[date.getDay()],
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
         : '0',
       lastActive: getTimeAgo(stats.lastActive),
       weeklyActivity,
-      recentActivities: recentActivities.map(activity => ({
+      recentActivities: recentActivities.map((activity: any) => ({
         id: activity._id.toString(),
         action: activity.action,
         time: getTimeAgo(activity.timestamp),

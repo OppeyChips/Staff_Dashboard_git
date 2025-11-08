@@ -5,13 +5,13 @@ import Project from '@/lib/models/Project';
 // GET - Fetch shared project by ID
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
 
-    const projectId = params.id;
-    const project = await Project.findById(projectId);
+    const { id } = await params;
+    const project = await Project.findById(id);
 
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
